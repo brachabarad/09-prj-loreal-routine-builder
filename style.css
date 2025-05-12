@@ -18,11 +18,24 @@ body {
   max-width: 900px;
 }
 
+/* —— Add brand colors as CSS variables —— */
+:root {
+  --loreal-black: #000000;
+  --loreal-white: #ffffff;
+  --loreal-gold: #e3a535;
+  --loreal-red: #ff003b;
+}
+
 /* header */
 .site-header {
   text-align: center;
   padding-top: 50px;
   padding-bottom: 10px;
+  background: linear-gradient(135deg, var(--loreal-gold), var(--loreal-white));
+  padding: 40px 0;
+  margin-bottom: 30px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -34,6 +47,9 @@ body {
   font-size: 22px;
   font-weight: 500;
   margin-bottom: 10px;
+  color: var(--loreal-black);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* category filter */
@@ -51,11 +67,14 @@ body {
   cursor: pointer;
   background-color: white;
   font-weight: 500;
+  border-color: var(--loreal-gold);
+  transition: all 0.3s ease;
 }
 
+.search-section select:hover,
 .search-section select:focus {
-  outline: none;
-  border-color: #666;
+  border-color: var(--loreal-red);
+  box-shadow: 0 0 0 2px rgba(255, 0, 59, 0.1);
 }
 
 /* chat section */
@@ -64,6 +83,8 @@ body {
   border: 2px solid #000;
   border-radius: 8px;
   padding: 26px;
+  border-color: var(--loreal-gold);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .chatbox h2 {
@@ -104,6 +125,7 @@ body {
   border: none;
   border-bottom: 2px solid #ccc;
   background: transparent;
+  border-bottom-color: var(--loreal-gold);
 }
 
 .chat-form input:focus {
@@ -123,16 +145,37 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  background: var(--loreal-red);
 }
 
 .chat-form button:hover {
-  background: #666666;
+  background: var(--loreal-black);
 }
 
 .chat-form button:focus {
   outline: 2px solid #000;
   outline-offset: 2px;
+}
+
+/* Chat message styles */
+.chat-message {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid var(--loreal-gold);
+}
+
+.chat-message.error {
+  border-color: var(--loreal-red);
+  color: var(--loreal-red);
+}
+
+/* Loading spinner */
+.fa-spinner {
+  margin-right: 8px;
+  color: var(--loreal-gold);
 }
 
 /* visually hidden */
@@ -154,6 +197,8 @@ body {
   text-align: center;
   font-size: 14px;
   color: #666;
+  border-top: 1px solid var(--loreal-gold);
+  padding-top: 20px;
 }
 
 .site-footer nav {
@@ -162,12 +207,13 @@ body {
 
 .site-footer a {
   margin: 0 8px;
-  color: #000;
+  color: var(--loreal-black);
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .site-footer a:hover {
-  color: #666666;
+  color: var(--loreal-red);
 }
 
 /* products grid */
@@ -186,6 +232,15 @@ body {
   display: flex;
   gap: 15px;
   min-height: 160px;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.product-card:hover {
+  border-color: var(--loreal-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .product-card img {
@@ -206,6 +261,7 @@ body {
 .product-card h3 {
   font-size: 16px;
   margin-bottom: 8px;
+  color: var(--loreal-black);
 }
 
 .product-card p {
@@ -219,6 +275,7 @@ body {
   padding: 20px;
   border: 2px solid #000;
   border-radius: 8px;
+  border-color: var(--loreal-gold);
 }
 
 .selected-products h2 {
@@ -243,13 +300,48 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  background: var(--loreal-red);
 }
 
 .generate-btn:hover {
-  background: #666;
+  background: var(--loreal-black);
 }
 
 .generate-btn i {
   margin-right: 8px;
+}
+
+.product-card.selected {
+  border: 2px solid var(--loreal-red);
+  background-color: rgba(255, 0, 59, 0.05);
+}
+
+.product-card.selected:hover {
+  border-color: var(--loreal-red);
+}
+
+/* Style for selected product items in the list */
+.selected-product-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--loreal-gold);
+}
+
+.selected-product-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.selected-product-item .remove-btn {
+  color: var(--loreal-red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
 }
