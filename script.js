@@ -155,8 +155,17 @@ chatForm.addEventListener("submit", (e) => {
 /* Get reference to generate button */
 const generateButton = document.getElementById("generateRoutine");
 
-/* Add these variables at the top with other variables */
-let conversationHistory = [];
+/* Update these variables at the top */
+// Store full conversation with the AI
+let conversationHistory = [
+  {
+    role: "system",
+    content:
+      "You are a professional beauty advisor helping with skincare and beauty routines.",
+  },
+];
+
+// Store the current routine separately
 let currentRoutine = "";
 
 /* Add this function after other function declarations */
@@ -238,7 +247,13 @@ generateButton.addEventListener("click", async () => {
 
     if (data.choices && data.choices[0]) {
       const routine = data.choices[0].message.content;
-      currentRoutine = routine; // Save routine for context
+      currentRoutine = routine;
+
+      // Add routine to conversation history
+      conversationHistory.push({
+        role: "assistant",
+        content: `Here is your personalized beauty routine: ${routine}`,
+      });
 
       // Display routine
       addChatMessage(
@@ -247,9 +262,6 @@ generateButton.addEventListener("click", async () => {
           "<br>"
         )}`
       );
-
-      // Add to conversation history
-      conversationHistory = [`Assistant: Here is your routine: ${routine}`];
     } else {
       throw new Error("No response from API");
     }
@@ -262,7 +274,7 @@ generateButton.addEventListener("click", async () => {
   }
 });
 
-/* Handle chat form submissions */
+/* Update the chat form submission handler */
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -271,69 +283,58 @@ chatForm.addEventListener("submit", async (e) => {
   // Check if question is beauty-related
   if (!isBeautyRelatedQuestion(userInput)) {
     addChatMessage(
-      "Sorry, I only have knoledge regarding beauty routine, skincare, haircare, makeup, or other beauty-related topics.",
+      "Sorry, I can only help with beauty routine, skincare, haircare, makeup, or other beauty-related topics.",
       true
     );
     return;
   }
 
-  const userMessage = `<strong>You:</strong> ${userInput}`;
-  addChatMessage(userMessage);
+  // Display user message and clear input
+  addChatMessage(`<strong>You:</strong> ${userInput}`);
   document.getElementById("userInput").value = "";
   addChatMessage('<i class="fa-solid fa-spinner fa-spin"></i> Thinking...');
 
   try {
-    // Create beauty-focused prompt
-    const prompt = `Previous conversation about beauty routine: 
-      ${conversationHistory.join("\n")}
-
-      User question: ${userInput}
-      
-      Current beauty routine context: ${currentRoutine}
-      
-      Please provide expert beauty advice focusing only on:
-      - The generated skincare/beauty routine
-      - Product usage and application
-      - Skincare concerns and solutions
-      - Haircare tips and techniques
-      - Makeup application and tips
-      - Beauty product recommendations
-      
-      Keep responses focused on beauty and personal care topics only.`;
+    // Add user's message to conversation history
+    conversationHistory.push({
+      role: "user",
+      content: userInput,
+    });
 
     const response = await fetch(OPENAI_API_KEY, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-4",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a professional beauty advisor. Only provide advice about beauty, skincare, haircare, makeup and related topics. If asked about unrelated topics, politely redirect to beauty discussions.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+        // Send the full conversation history
+        messages: conversationHistory,
         temperature: 0.7,
         max_tokens: 300,
       }),
     });
 
     const data = await response.json();
-    chatWindow.lastChild.remove(); // Remove loading
+    chatWindow.lastChild.remove(); // Remove loading indicator
 
     if (data.choices && data.choices[0]) {
       const aiResponse = data.choices[0].message.content;
+
+      // Add AI response to conversation history
+      conversationHistory.push({
+        role: "assistant",
+        content: aiResponse,
+      });
+
+      // Display AI response
       addChatMessage(`<strong>Beauty Advisor:</strong> ${aiResponse}`);
 
-      // Update conversation history (keep last 4 messages)
-      conversationHistory.push(`User: ${userInput}`);
-      conversationHistory.push(`Assistant: ${aiResponse}`);
-      if (conversationHistory.length > 4) {
-        conversationHistory = conversationHistory.slice(-4);
+      // Keep conversation history manageable (last 10 messages)
+      if (conversationHistory.length > 12) {
+        // 1 system + 10 messages + 1 buffer
+        conversationHistory = [
+          conversationHistory[0], // Keep system message
+          ...conversationHistory.slice(-10), // Keep last 10 messages
+        ];
       }
     } else {
       throw new Error("Invalid API response");
